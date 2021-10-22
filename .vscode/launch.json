@@ -13,6 +13,14 @@
             "cwd": "${workspaceFolder}/src"
         },
         {
+            "name": "Python: Build",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/build.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/src"
+        },
+        {
             "name": "Python: File corrente",
             "type": "python",
             "request": "launch",
