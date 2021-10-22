@@ -1,3 +1,4 @@
+from threading import Thread
 import pygame
 import time
 from typing import List
@@ -62,14 +63,23 @@ class EventLoop(Node):
 
     def start(self) -> None:
         self.is_running = True
+        self.clock = pygame.time.Clock()
+        self.framerate = 60
+        self.current_framerate = 0
+        self.update_thread = Thread(target=self.start_update)
 
         super().start()
+        self.update_thread.start()
+
+    def start_update(self):
         while self.is_running:
             self.update()
             
     def update(self) -> None:
         self._current_events = pygame.event.get()
-        return super().update()
+        super().update()
+        self.clock.tick(self.framerate)
+        self.current_framerate = self.clock.get_fps()
 
     def stop(self) -> None:
         self.is_running = False

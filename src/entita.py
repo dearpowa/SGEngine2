@@ -6,6 +6,7 @@ class Player(Node):
     def start(self) -> None:
         self.sprite = pygame.image.load("assets/simpleguy_small.bmp")
         self.sprite = pygame.transform.scale(self.sprite, (30, 30))
+        self.sprite.set_colorkey((0,0,0))
         self.rect = self.sprite.get_rect()
         self.movement_x = [False, False]
         self.movement_y = [False, False]

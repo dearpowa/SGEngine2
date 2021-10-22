@@ -58,7 +58,7 @@ class WindowManager(lifecycle.Node):
         self._window = window
 
     def update_window(self) -> None:
-        self.window = pygame.display.set_mode(self.resolution, flags=pygame.HWSURFACE|pygame.DOUBLEBUF)
+        self.window = pygame.display.set_mode(self.resolution, flags=pygame.HWSURFACE|pygame.DOUBLEBUF, vsync=1)
         pygame.display.set_caption(self.title)
 
 
@@ -80,10 +80,16 @@ class Camera(lifecycle.Node):
         
 
         for node in sgengine.event_loop().alive_nodes():
-            if hasattr(node, "sprite") and hasattr(node, "rect"):
+            if hasattr(node, "sprite") and node.sprite != None and hasattr(node, "rect") and node.rect != None:
                 sprite = node.sprite
                 rect = node.rect
                 frame.blit(sprite, rect)
+
+        for node in sgengine.event_loop().alive_nodes():
+            if hasattr(node, "text") and node.text != None and hasattr(node, "rect") and node.rect != None:
+                text = node.text
+                rect = node.rect
+                frame.blit(text, rect)
                 
         wm.window.blit(frame, (0,0))
         pygame.display.update()
