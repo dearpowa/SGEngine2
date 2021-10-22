@@ -10,8 +10,8 @@ class Node:
 
     def __init__(self) -> None:
         self.position = (0, 0)
-        self.parent = None
-        self.childs = []
+        self.parent: 'Node' = None
+        self.childs: List['Node'] = []
         self.id = time.time() * 1000
         #Se l'event loop è in creazione, deve accedere a se stesso direttamente
         if issubclass(type(self), EventLoop):
@@ -29,26 +29,74 @@ class Node:
     def update(self) -> None:
         for child in self.childs:
             if issubclass(type(child), Node):
-                child.update()
+                #Se il figlio non è vivo provo a eliminarlo di nuovo
+                if child.is_alive():
+                    child.update()
+                else:
+                    child.kill()
+            else:
+                #Se il figlio non è un nodo lo rimuovo
+                self.remove_child(child)
         pass
-
-    def add_child(self, child) -> None:
+    
+    """
+    Aggiunge un figlio al nodo
+    ritorna se il processo è andato a buon fine
+    """
+    def add_child(self, child: 'Node') -> bool:
         if issubclass(type(child), Node):
             child.parent = self
             child.start()
             self.childs.append(child)
+            return True
+        else:
+            return False
 
-    def remove_child(self, child) -> None:
+    """
+    Rimuove un figlio dal nodo
+    ritorna se il processo è andato a buon fine
+    """
+    def remove_child(self, child: 'Node') -> bool:
         try:
             self.childs.remove(child)
             child.parent = None
-        finally:
-            pass
+            return True
+        except: 
+            return False
 
-    def kill(self):
-        if self.parent != None:
-            self.parent.remove_child(self)
-        EventLoop.remove_alive_node(self)
+    """
+    Sostituisco un figlio con uno nuovo, quello vecchio viene anche eliminato dalla lista dei nodi vivi
+    ritorna se il processo è andato a buon fine
+    """
+    def substitute_child(self, child: 'Node', new_child: 'Node') -> bool:
+        return child.kill() and self.add_child(new_child)
+
+    """
+    Elimino il nodo, se ha figli elimino anche i figli, se ha un genitore rimuovo il nodo dal genitore
+    infine elimino il nodo dalla lista dei nodi vivi
+    ritorna se il processo è andato a buon fine
+    """
+    def kill(self) -> bool:
+        #Se uccido un nodo devo uccidere anche tutti i figli
+        try:
+            result = True
+
+            for c in self.childs:
+                result = result and c.kill()
+
+            if self.parent != None:
+                result = self.parent.remove_child(self)
+            
+            sgengine.event_loop().remove_alive_node(self)
+            return result
+        except:
+            return False
+
+    """
+    ritorna se il nodo è presente nella lista dei nodi vivi
+    """
+    def is_alive(self) -> bool:
+        return sgengine.event_loop().is_node_alive(self)
         
 
 
@@ -89,17 +137,34 @@ class EventLoop(Node):
             self._current_events = []
         return self._current_events
 
+    """
+    ritorna la lista dei nodi vivi
+    """
     def alive_nodes(self) -> List[Node]:
         if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
             self._alive_nodes = []
         return self._alive_nodes[:]
 
+    """
+    aggiunge un nodo alla lista dei nodi vivi
+    """
     def add_alive_node(self, node: Node) -> None:
         if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
             self._alive_nodes = []
         self._alive_nodes.append(node)
 
+    """
+    rimuove un nodo dalla lista dei nodi vivi
+    """
     def remove_alive_node(self, node: Node) -> None:
         if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
             self._alive_nodes = []
         self._alive_nodes.remove(node)
+
+    """
+    ritorna se un nodo è presente nella lista dei nodi vivi
+    """
+    def is_node_alive(self, node: Node) -> bool:
+        if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
+            self._alive_nodes = []
+        return node in self._alive_nodes
