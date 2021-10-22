@@ -2,6 +2,8 @@ from sgengine.lifecycle import Node
 import sgengine
 import pygame
 
+from sgengine.screen import Camera
+
 class Player(Node):
     def start(self) -> None:
         self.sprite = pygame.image.load("assets/simpleguy_small.bmp")
@@ -11,6 +13,7 @@ class Player(Node):
         self.movement_x = [False, False]
         self.movement_y = [False, False]
         self.movement_speed = 5
+        self.camera = self.find_node_by_type(Camera)
         return super().start()
 
     def update(self) -> None:
@@ -54,5 +57,7 @@ class Player(Node):
                 y = +self.movement_speed
 
         self.rect = self.sprite.get_rect(top=self.rect.top, left=self.rect.left).move(x, y)
+
+        #self.camera.rect.center = self.rect.center
 
         return super().update()

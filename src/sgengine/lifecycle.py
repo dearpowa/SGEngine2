@@ -1,7 +1,7 @@
 from threading import Thread
 import pygame
 import time
-from typing import List
+from typing import ClassVar, List, Type
 
 import sgengine
 
@@ -43,10 +43,11 @@ class Node:
     Aggiunge un figlio al nodo
     ritorna se il processo è andato a buon fine
     """
-    def add_child(self, child: 'Node') -> bool:
+    def add_child(self, child: 'Node', trigger_start=False) -> bool:
         if issubclass(type(child), Node):
             child.parent = self
-            child.start()
+            if trigger_start:
+                child.start()
             self.childs.append(child)
             return True
         else:
@@ -97,6 +98,9 @@ class Node:
     """
     def is_alive(self) -> bool:
         return sgengine.event_loop().is_node_alive(self)
+
+    def find_node_by_type(self, clz) -> 'Node':
+        return sgengine.event_loop().find_node_by_type(clz)
         
 
 
@@ -114,10 +118,10 @@ class EventLoop(Node):
         self.clock = pygame.time.Clock()
         self.framerate = 60
         self.current_framerate = 0
-        self.update_thread = Thread(target=self.start_screen_update)
+        self.screen_update_thread = Thread(target=self.start_screen_update)
 
         super().start()
-        self.update_thread.start()
+        self.screen_update_thread.start()
         self.start_update()
 
     def start_update(self):
@@ -173,3 +177,10 @@ class EventLoop(Node):
         if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
             self._alive_nodes = []
         return node in self._alive_nodes
+
+    def find_node_by_type(self, clz) -> Node:
+        for node in self.alive_nodes():
+            if (issubclass(type(node), clz)):
+                return node
+
+        return None

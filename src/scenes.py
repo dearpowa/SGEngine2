@@ -16,7 +16,7 @@ class Scene1(Node):
 
     def update(self) -> None:
         fps = sgengine.event_loop().current_framerate
-        self.text = self.font.render(str(fps), True, (255, 255, 255))
+        self.text = self.font.render("{:.1f}".format(fps), True, (255, 255, 255))
         self.rect = self.text.get_rect(top=0, left=0)
 
         return super().update()

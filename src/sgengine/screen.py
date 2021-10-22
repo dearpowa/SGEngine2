@@ -64,6 +64,7 @@ class WindowManager(lifecycle.Node):
 
 class Camera(lifecycle.Node):
     def start(self) -> None:
+        self.rect: pygame.Rect = pygame.Rect(0, 0, 0, 0)
         return super().start()
 
     def update(self) -> None:
@@ -77,12 +78,18 @@ class Camera(lifecycle.Node):
             return
 
         frame = pygame.Surface(wm.window.get_size(), flags=pygame.HWSURFACE)
+
+        frame_rect = frame.get_rect()
         
+        self.rect.width = frame_rect.width
+        self.rect.height = frame_rect.height
+
+        print(self.rect)
 
         for node in sgengine.event_loop().alive_nodes():
             if hasattr(node, "sprite") and node.sprite != None and hasattr(node, "rect") and node.rect != None:
                 sprite = node.sprite
-                rect = node.rect
+                rect = node.rect.move(-self.rect.left, -self.rect.top)
                 frame.blit(sprite, rect)
 
         for node in sgengine.event_loop().alive_nodes():
