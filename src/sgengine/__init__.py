@@ -8,10 +8,12 @@ def event_loop() -> lifecycle.EventLoop:
 def window_manager() -> lifecycle.EventLoop:
     return screen.WindowManager.get_instance()
 
-def start():
+def init():
     pygame.init()
     #Aggiungo il window manager al loop in modo che possa creare la finestra
     event_loop().add_child(window_manager())
+
+def start():
     event_loop().start()
 
 

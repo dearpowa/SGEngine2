@@ -114,14 +114,19 @@ class EventLoop(Node):
         self.clock = pygame.time.Clock()
         self.framerate = 60
         self.current_framerate = 0
-        self.update_thread = Thread(target=self.start_update)
+        self.update_thread = Thread(target=self.start_screen_update)
 
         super().start()
         self.update_thread.start()
+        self.start_update()
 
     def start_update(self):
         while self.is_running:
             self.update()
+
+    def start_screen_update(self):
+        while self.is_running:
+            pygame.display.update()
             
     def update(self) -> None:
         self._current_events = pygame.event.get()

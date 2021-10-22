@@ -92,7 +92,6 @@ class Camera(lifecycle.Node):
                 frame.blit(text, rect)
                 
         wm.window.blit(frame, (0,0))
-        pygame.display.update()
 
     def find_window_manager(self) -> WindowManager:
         return sgengine.window_manager()

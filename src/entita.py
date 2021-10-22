@@ -53,8 +53,6 @@ class Player(Node):
             if self.movement_y[1]:
                 y = +self.movement_speed
 
-        print((x, y))
-
         self.rect = self.sprite.get_rect(top=self.rect.top, left=self.rect.left).move(x, y)
 
         return super().update()
