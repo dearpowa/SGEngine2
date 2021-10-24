@@ -84,8 +84,6 @@ class Camera(lifecycle.Node):
         self.rect.width = frame_rect.width
         self.rect.height = frame_rect.height
 
-        print(self.rect)
-
         for node in sgengine.event_loop().alive_nodes():
             if hasattr(node, "sprite") and node.sprite != None and hasattr(node, "rect") and node.rect != None:
                 sprite = node.sprite

@@ -24,6 +24,9 @@ class Node:
         for child in self.childs:
             if issubclass(type(child), Node):
                 child.start()
+        self.started()
+
+    def started(self) -> None:
         pass
 
     def update(self) -> None:
