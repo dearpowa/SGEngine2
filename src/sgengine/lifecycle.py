@@ -1,3 +1,4 @@
+import random
 from threading import Thread
 import pygame
 import time
@@ -12,7 +13,7 @@ class Node:
         self.position = (0, 0)
         self.parent: 'Node' = None
         self.childs: List['Node'] = []
-        self.id = time.time() * 1000
+        self.id = time.time() * 1000 * random.uniform(128, 1028)
         self.rect = pygame.Rect(0, 0, 0, 0)
         self.solid = False
         self.camera_priority = 0
