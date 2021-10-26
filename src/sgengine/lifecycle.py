@@ -125,7 +125,7 @@ class EventLoop(Node):
     def start(self) -> None:
         self.is_running = True
         self.clock = pygame.time.Clock()
-        self.framerate = 60
+        self.framerate = 120
         self.current_framerate = 0
         self.screen_update_thread = Thread(target=self.start_screen_update)
 

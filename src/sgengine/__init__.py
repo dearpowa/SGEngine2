@@ -5,7 +5,7 @@ import pygame
 def event_loop() -> lifecycle.EventLoop:
     return lifecycle.EventLoop.get_instance()
 
-def window_manager() -> lifecycle.EventLoop:
+def window_manager() -> screen.WindowManager:
     return screen.WindowManager.get_instance()
 
 def init():
