@@ -3,6 +3,7 @@ from sgengine import lifecycle
 import pygame
 import sgengine
 
+
 class WindowManager(lifecycle.Node):
 
     _instance = None
@@ -18,7 +19,7 @@ class WindowManager(lifecycle.Node):
         return super().start()
 
     def update(self) -> None:
-        #cerco di ottenere gli eventi in modo da capire quando la finestra viene chiusa
+        # cerco di ottenere gli eventi in modo da capire quando la finestra viene chiusa
         for event in sgengine.event_loop().get_current_events():
             if event.type == pygame.QUIT:
                 sgengine.stop()
@@ -41,7 +42,7 @@ class WindowManager(lifecycle.Node):
         if not hasattr(self, "_title"):
             self._title = "SGEngine 2.0"
         return self._title
-    
+
     @title.setter
     def title(self, title) -> None:
         self._title = title
@@ -58,13 +59,15 @@ class WindowManager(lifecycle.Node):
         self._window = window
 
     def update_window(self) -> None:
-        self.window = pygame.display.set_mode(self.resolution, flags=pygame.HWSURFACE|pygame.DOUBLEBUF, vsync=1)
+        self.window = pygame.display.set_mode(
+            self.resolution, flags=pygame.HWSURFACE | pygame.DOUBLEBUF, vsync=1)
         pygame.display.set_caption(self.title)
 
 
 class Camera(lifecycle.Node):
     def start(self) -> None:
         self.rect: pygame.Rect = pygame.Rect(0, 0, 0, 0)
+        self.solid = False
         return super().start()
 
     def update(self) -> None:
@@ -77,26 +80,30 @@ class Camera(lifecycle.Node):
         if wm == None or wm.window == None:
             return
 
+        alive_nodes = sgengine.event_loop().alive_nodes()
+        alive_nodes.sort(
+            key=lambda n: n.camera_priority, reverse=True)
+
         frame = pygame.Surface(wm.window.get_size(), flags=pygame.HWSURFACE)
 
         frame_rect = frame.get_rect()
-        
+
         self.rect.width = frame_rect.width
         self.rect.height = frame_rect.height
 
-        for node in sgengine.event_loop().alive_nodes():
-            if hasattr(node, "sprite") and node.sprite != None and hasattr(node, "rect") and node.rect != None:
+        for node in alive_nodes:
+            if hasattr(node, "sprite") and node.sprite != None and node.rect != None:
                 sprite = node.sprite
                 rect = node.rect.move(-self.rect.left, -self.rect.top)
                 frame.blit(sprite, rect)
 
         for node in sgengine.event_loop().alive_nodes():
-            if hasattr(node, "text") and node.text != None and hasattr(node, "rect") and node.rect != None:
+            if hasattr(node, "text") and node.text != None and node.rect != None:
                 text = node.text
                 rect = node.rect
                 frame.blit(text, rect)
-                
-        wm.window.blit(frame, (0,0))
+
+        wm.window.blit(frame, (0, 0))
 
     def find_window_manager(self) -> WindowManager:
         return sgengine.window_manager()

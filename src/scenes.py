@@ -6,10 +6,12 @@ from sgengine.screen import Camera
 from entita import Player, Tree
 from sgengine.utils import FPSCounter
 
+
 class Scene1(Node):
-    
+
     def start(self) -> None:
-        self.add_child(Player())
+        self.player = Player()
+        self.add_child(self.player)
         self.add_child(Camera())
         self.add_child(FPSCounter())
 
@@ -24,14 +26,11 @@ class Scene1(Node):
         return super().start()
 
     def started(self) -> None:
-        self.tree1.rect.move_ip(30, 50)
-        self.tree2.rect.move_ip(60, 10)
-        self.tree3.rect.move_ip(200, 150)
+        self.tree1.rect.move_ip(30, 100)
+        self.tree2.rect.move_ip(100, 10)
+        self.tree3.rect.move_ip(500, 150)
+        self.player.rect.move_ip(-100, -100)
         return super().started()
 
     def update(self) -> None:
-
-        for child in self.childs:
-            if (issubclass(type(child), Tree)):
-                print(child.rect)
         return super().update()

@@ -13,12 +13,14 @@ class Node:
         self.parent: 'Node' = None
         self.childs: List['Node'] = []
         self.id = time.time() * 1000
-        #Se l'event loop è in creazione, deve accedere a se stesso direttamente
+        self.rect = pygame.Rect(0, 0, 0, 0)
+        self.solid = False
+        self.camera_priority = 0
+        # Se l'event loop è in creazione, deve accedere a se stesso direttamente
         if issubclass(type(self), EventLoop):
             self.add_alive_node(self)
         else:
             sgengine.event_loop().add_alive_node(self)
-
 
     def start(self) -> None:
         for child in self.childs:
@@ -32,20 +34,21 @@ class Node:
     def update(self) -> None:
         for child in self.childs:
             if issubclass(type(child), Node):
-                #Se il figlio non è vivo provo a eliminarlo di nuovo
+                # Se il figlio non è vivo provo a eliminarlo di nuovo
                 if child.is_alive():
                     child.update()
                 else:
                     child.kill()
             else:
-                #Se il figlio non è un nodo lo rimuovo
+                # Se il figlio non è un nodo lo rimuovo
                 self.remove_child(child)
         pass
-    
+
     """
     Aggiunge un figlio al nodo
     ritorna se il processo è andato a buon fine
     """
+
     def add_child(self, child: 'Node', trigger_start=False) -> bool:
         if issubclass(type(child), Node):
             child.parent = self
@@ -60,18 +63,20 @@ class Node:
     Rimuove un figlio dal nodo
     ritorna se il processo è andato a buon fine
     """
+
     def remove_child(self, child: 'Node') -> bool:
         try:
             self.childs.remove(child)
             child.parent = None
             return True
-        except: 
+        except:
             return False
 
     """
     Sostituisco un figlio con uno nuovo, quello vecchio viene anche eliminato dalla lista dei nodi vivi
     ritorna se il processo è andato a buon fine
     """
+
     def substitute_child(self, child: 'Node', new_child: 'Node') -> bool:
         return child.kill() and self.add_child(new_child)
 
@@ -80,8 +85,9 @@ class Node:
     infine elimino il nodo dalla lista dei nodi vivi
     ritorna se il processo è andato a buon fine
     """
+
     def kill(self) -> bool:
-        #Se uccido un nodo devo uccidere anche tutti i figli
+        # Se uccido un nodo devo uccidere anche tutti i figli
         try:
             result = True
 
@@ -90,7 +96,7 @@ class Node:
 
             if self.parent != None:
                 result = self.parent.remove_child(self)
-            
+
             sgengine.event_loop().remove_alive_node(self)
             return result
         except:
@@ -99,12 +105,12 @@ class Node:
     """
     ritorna se il nodo è presente nella lista dei nodi vivi
     """
+
     def is_alive(self) -> bool:
         return sgengine.event_loop().is_node_alive(self)
 
     def find_node_by_type(self, clz) -> 'Node':
         return sgengine.event_loop().find_node_by_type(clz)
-        
 
 
 class EventLoop(Node):
@@ -134,7 +140,7 @@ class EventLoop(Node):
     def start_screen_update(self):
         while self.is_running:
             pygame.display.update()
-            
+
     def update(self) -> None:
         self._current_events = pygame.event.get()
         super().update()
@@ -152,6 +158,7 @@ class EventLoop(Node):
     """
     ritorna la lista dei nodi vivi
     """
+
     def alive_nodes(self) -> List[Node]:
         if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
             self._alive_nodes = []
@@ -160,6 +167,7 @@ class EventLoop(Node):
     """
     aggiunge un nodo alla lista dei nodi vivi
     """
+
     def add_alive_node(self, node: Node) -> None:
         if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
             self._alive_nodes = []
@@ -168,6 +176,7 @@ class EventLoop(Node):
     """
     rimuove un nodo dalla lista dei nodi vivi
     """
+
     def remove_alive_node(self, node: Node) -> None:
         if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
             self._alive_nodes = []
@@ -176,6 +185,7 @@ class EventLoop(Node):
     """
     ritorna se un nodo è presente nella lista dei nodi vivi
     """
+
     def is_node_alive(self, node: Node) -> bool:
         if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
             self._alive_nodes = []
