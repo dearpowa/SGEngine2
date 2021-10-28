@@ -1,4 +1,4 @@
-from sgengine import utils
+from sgengine import physics, utils
 from sgengine.lifecycle import Node
 import sgengine
 import pygame
@@ -18,6 +18,7 @@ class Player(Node):
         self.camera_priority = -10
         self.solid = True
         self.camera = self.find_node_by_type(Camera)
+        self.gravity_settings.enabled = True
         return super().start()
 
     def update(self) -> None:
@@ -58,12 +59,13 @@ class Player(Node):
             if self.movement_y[1]:
                 y = +self.movement_speed
 
+        last_pos = self.rect.copy()
         self.rect.move_ip(x, y)
 
-        colliding, other = utils.is_colliding(self)
+        colliding, other = physics.is_colliding(self)
 
         if (colliding):
-            self.rect.move_ip(-x, -y)
+            self.rect.topleft = last_pos.topleft
 
         self.camera.rect.center = self.rect.center
 

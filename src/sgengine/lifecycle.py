@@ -3,9 +3,7 @@ from threading import Thread
 import pygame
 import time
 from typing import ClassVar, List, Type
-
 import sgengine
-
 
 class Node:
 
@@ -17,6 +15,7 @@ class Node:
         self.rect = pygame.Rect(0, 0, 0, 0)
         self.solid = False
         self.camera_priority = 0
+        self.gravity_settings = physics.GravitySettings()
         # Se l'event loop è in creazione, deve accedere a se stesso direttamente
         if issubclass(type(self), EventLoop):
             self.add_alive_node(self)
@@ -113,6 +112,7 @@ class Node:
     def find_node_by_type(self, clz) -> 'Node':
         return sgengine.event_loop().find_node_by_type(clz)
 
+from sgengine import physics
 
 class EventLoop(Node):
     _instance = None
