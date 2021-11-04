@@ -1,9 +1,18 @@
 from typing import Tuple
 from sgengine import lifecycle
 import pygame
+import math
 
 import sgengine
 
+
+def create_line(origin: Tuple[float, float], lenght: float, angle: float) -> Tuple[Tuple[float], Tuple[float]]:
+    return(origin, (origin[0] + (lenght * math.cos(math.radians(angle))), origin[1] + (lenght * math.sin(math.radians(angle)))))
+
+def line_lenght(origin: Tuple[float, float], end: Tuple[float, float]) -> float:
+    x1, y1 = origin
+    x2, y2 = end
+    return math.sqrt(math.pow(x2 - x1, 2) + math.pow(y2 - y1, 2))
 
 class FPSCounter(lifecycle.Node):
 

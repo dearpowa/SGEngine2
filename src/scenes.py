@@ -4,7 +4,7 @@ import sgengine
 from sgengine.lifecycle import Node
 from sgengine.physics import Gravity
 from sgengine.screen import Camera
-from entita import Player, Tree
+from entita import FPSCamera, FPSPlayer, Player, Tree, Wall
 from sgengine.utils import FPSCounter
 
 
@@ -37,3 +37,21 @@ class Scene1(Node):
 
     def update(self) -> None:
         return super().update()
+
+
+class Scene2(Node):
+    def start(self) -> None:
+        self.wall1 = Wall()
+        self.wall2 = Wall()
+        self.add_child(FPSCamera())
+        self.add_child(FPSPlayer())
+        self.add_child(self.wall1)
+        self.add_child(self.wall2)
+        return super().start()
+
+    def started(self) -> None:
+        self.wall1.rect.move_ip(-30, 30)
+        self.wall2.rect.move_ip(30, 30)
+        self.wall1.color = (255, 0, 0)
+        self.wall2.color = (0, 255, 0)
+        return super().started()
