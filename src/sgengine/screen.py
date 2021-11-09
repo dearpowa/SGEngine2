@@ -68,6 +68,7 @@ class Camera(lifecycle.Node):
     def start(self) -> None:
         self.rect: pygame.Rect = pygame.Rect(0, 0, 0, 0)
         self.solid = False
+        self.transparent = False
         return super().start()
 
     def update(self) -> None:
@@ -85,6 +86,11 @@ class Camera(lifecycle.Node):
             key=lambda n: n.camera_priority, reverse=True)
 
         frame = pygame.Surface(wm.window.get_size(), flags=pygame.HWSURFACE)
+
+        if (self.transparent):
+            frame = frame.convert_alpha()
+            frame.fill((0, 0, 0))
+            frame.set_colorkey((0, 0, 0))
 
         frame_rect = frame.get_rect()
 

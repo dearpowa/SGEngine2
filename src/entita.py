@@ -96,6 +96,9 @@ class FPSCamera(Camera):
         self.rotation = 0
         self.rect = pygame.Rect(0, 0, 0 ,0)
         self.scan_resolution = 100
+        self.scale = (1, 1)
+        self.last_frame: pygame.Surface = None
+        self.render_thread: Thread = None
 
         return super().start()
 
@@ -106,21 +109,33 @@ class FPSCamera(Camera):
         if wm == None or wm.window == None:
             return
 
+        self.construct_frame()
+        
+        if self.last_frame:
+            wm.window.blit(self.last_frame, (0, 0))
 
+    def construct_frame(self):
+        wm = self.find_window_manager()
+
+        if wm == None or wm.window == None:
+            return
+    
         half_fov = self.fov/2
         start_angle = int(self.rotation - half_fov)
         finish_angle = int(self.rotation + half_fov)
 
         origin = self.rect.center
 
-        frame = pygame.Surface(wm.window.get_size(), flags=pygame.HWSURFACE)
+        frame = pygame.Surface(tuple(ele1 * ele2 for ele1, ele2 in zip(wm.window.get_size(), self.scale)), flags=pygame.HWSURFACE)
 
-        step_size = frame.get_rect().width / self.fov
+        step_size = self.fov / frame.get_rect().width
 
         alive_nodes = sgengine.event_loop().alive_nodes()
 
-        for i in range(start_angle, finish_angle):
-            line = utils.create_line(origin, self.render_distance, i)
+        angle = start_angle
+
+        for i in range(frame.get_rect().width):
+            line = utils.create_line(origin, self.render_distance, angle)
 
             lenghts = []
 
@@ -141,23 +156,29 @@ class FPSCamera(Camera):
                 closer_lenght = lenghts[0][0]
                 color = lenghts[0][1]
 
-                ratio = (closer_lenght / self.render_distance) * 100
+                angle_diff = self.rotation - angle
 
-                screen_ratio = 100 - ratio
+                closer_lenght = closer_lenght * math.cos(math.radians(angle_diff))
 
-                height_to_screen = ((screen_ratio / 100) * 400) + 30
+                height_to_screen = frame.get_height() / (closer_lenght / 10)
 
-                rect_to_draw = pygame.Rect(0, 0, step_size, height_to_screen)
+                height_to_screen = height_to_screen if height_to_screen < frame.get_height() else frame.get_height()
+
+                rect_to_draw = pygame.Rect(0, 0, 1, height_to_screen)
                 rect_to_draw.centery = frame.get_rect().centery
-                rect_to_draw.left = (i - start_angle) * step_size
+                rect_to_draw.left = i
 
                 frame.fill(color, rect_to_draw)
 
-        wm.window.blit(frame, (0, 0))
+            angle += step_size
+
+        frame = pygame.transform.scale(frame, wm.window.get_size())
+        self.last_frame = frame
+
 
 class FPSPlayer(Node):
     def start(self) -> None:
-        self.movement_speed = 5
+        self.movement_speed = 3
         self.movement_x = [False, False]
         self.movement_y = [False, False]
         self.camera = self.find_node_by_type(FPSCamera)

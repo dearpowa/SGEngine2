@@ -43,7 +43,10 @@ class Scene2(Node):
     def start(self) -> None:
         self.wall1 = Wall()
         self.wall2 = Wall()
+        self.camera = Camera()
         self.add_child(FPSCamera())
+        self.add_child(self.camera)
+        self.add_child(FPSCounter())
         self.add_child(FPSPlayer())
         self.add_child(self.wall1)
         self.add_child(self.wall2)
@@ -54,4 +57,5 @@ class Scene2(Node):
         self.wall2.rect.move_ip(30, 30)
         self.wall1.color = (255, 0, 0)
         self.wall2.color = (0, 255, 0)
+        self.camera.transparent = True
         return super().started()

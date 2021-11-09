@@ -24,6 +24,9 @@ class FPSCounter(lifecycle.Node):
 
     def update(self) -> None:
         fps = sgengine.event_loop().current_framerate
-        self.text = self.font.render(
-            "{:.1f}".format(fps), True, (255, 255, 255))
+        frametime = sgengine.event_loop().current_frametime
+
+        text = "fps: " + "{:.1f}".format(fps) + " frametime: " + "{:.1f}".format(frametime)
+
+        self.text = self.font.render(text, True, (255, 255, 255))
         return super().update()
