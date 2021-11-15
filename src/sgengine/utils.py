@@ -19,7 +19,7 @@ class FPSCounter(lifecycle.Node):
     def start(self) -> None:
         self.rect = pygame.Rect(0, 0, 0, 0)
         self.text: pygame.Surface = None
-        self.font = pygame.font.Font("assets/OpenSans-Regular.ttf", 30)
+        self.set_size(30)
         return super().start()
 
     def update(self) -> None:
@@ -30,3 +30,6 @@ class FPSCounter(lifecycle.Node):
 
         self.text = self.font.render(text, True, (255, 255, 255))
         return super().update()
+
+    def set_size(self, size: int) -> None:
+        self.font = pygame.font.Font("assets/OpenSans-Regular.ttf", size)

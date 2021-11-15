@@ -13,9 +13,11 @@ class Scene1(Node):
     def start(self) -> None:
         self.player = Player()
         gravity = Gravity()
+        camera = Camera()
+        fps_counter = FPSCounter()
         self.add_child(self.player)
-        self.add_child(Camera())
-        self.add_child(FPSCounter())
+        self.add_child(camera)
+        self.add_child(fps_counter)
         self.add_child(gravity)
 
         self.tree1 = Tree()
@@ -26,16 +28,25 @@ class Scene1(Node):
         self.add_child(self.tree2)
         self.add_child(self.tree3)
 
-        return super().start()
+        super().start()
+        camera.internal_resolution = (160, 90)
+        fps_counter.set_size(10)
+        sgengine.window_manager().resolution = (1280, 720)
+        sgengine.window_manager().fullscreen = True
 
     def started(self) -> None:
-        self.tree1.rect.move_ip(30, 100)
-        self.tree2.rect.move_ip(100, 10)
-        self.tree3.rect.move_ip(500, 150)
-        self.player.rect.move_ip(0, -500)
+        self.tree1.rect.move_ip(0, 10)
+        self.tree2.rect.move_ip(10, 10)
+        self.tree3.rect.move_ip(50, 15)
+        self.player.rect.move_ip(0, -50)
         return super().started()
 
     def update(self) -> None:
+        events = sgengine.event_loop().get_current_events()
+
+        for e in events:
+            if e.type == pygame.KEYUP and e.key == pygame.K_ESCAPE:
+                sgengine.event_loop().is_running = False
         return super().update()
 
 

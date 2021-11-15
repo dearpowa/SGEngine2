@@ -10,16 +10,15 @@ from sgengine.screen import Camera
 class Player(Node):
     def start(self) -> None:
         self.sprite = pygame.image.load("assets/simpleguy_small.bmp")
-        self.sprite = pygame.transform.scale(self.sprite, (100, 100))
         self.sprite.set_colorkey((0, 0, 0))
         self.rect = self.sprite.get_rect()
         self.movement_x = [False, False]
         self.movement_y = [False, False]
-        self.movement_speed = 5
+        self.movement_speed = 1
         self.camera_priority = -10
         self.solid = True
         self.camera = self.find_node_by_type(Camera)
-        self.gravity_settings.enabled = True
+        self.gravity_settings.enabled = False
         return super().start()
 
     def update(self) -> None:
@@ -75,7 +74,6 @@ class Player(Node):
 class Tree(Node):
     def start(self) -> None:
         self.sprite = pygame.image.load("assets/simpletree.bmp")
-        self.sprite = pygame.transform.scale(self.sprite, (100, 100))
         self.sprite.set_colorkey((0, 0, 0))
         self.rect = self.sprite.get_rect()
         self.solid = True

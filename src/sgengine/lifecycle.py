@@ -154,7 +154,7 @@ class EventLoop(Node):
     def stop(self) -> None:
         self.is_running = False
 
-    def get_current_events(self) -> List:
+    def get_current_events(self) -> List[pygame.event.Event]:
         if not hasattr(self, "_current_events"):
             self._current_events = []
         return self._current_events

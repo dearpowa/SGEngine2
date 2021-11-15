@@ -58,9 +58,21 @@ class WindowManager(lifecycle.Node):
     def window(self, window) -> None:
         self._window = window
 
+    @property
+    def fullscreen(self) -> bool:
+        if not hasattr(self, "_fullscreen"):
+            return False
+        return self._fullscreen
+
+    @fullscreen.setter
+    def fullscreen(self, fullscreen) -> None:
+        self._fullscreen = fullscreen
+        self.update_window()
+
     def update_window(self) -> None:
-        self.window = pygame.display.set_mode(
-            self.resolution, flags=pygame.HWSURFACE | pygame.DOUBLEBUF, vsync=1)
+        flags = pygame.HWSURFACE | pygame.DOUBLEBUF | pygame.FULLSCREEN if self.fullscreen else pygame.HWSURFACE | pygame.DOUBLEBUF
+
+        self.window = pygame.display.set_mode(self.resolution, flags=flags, vsync=1)
         pygame.display.set_caption(self.title)
 
 
@@ -69,6 +81,7 @@ class Camera(lifecycle.Node):
         self.rect: pygame.Rect = pygame.Rect(0, 0, 0, 0)
         self.solid = False
         self.transparent = False
+        self.internal_resolution = (0, 0)
         return super().start()
 
     def update(self) -> None:
@@ -81,11 +94,14 @@ class Camera(lifecycle.Node):
         if wm == None or wm.window == None:
             return
 
+        if not self.internal_resolution or self.internal_resolution == (0, 0):
+            self.internal_resolution = wm.window.get_size()
+
         alive_nodes = sgengine.event_loop().alive_nodes()
         alive_nodes.sort(
             key=lambda n: n.camera_priority, reverse=True)
 
-        frame = pygame.Surface(wm.window.get_size(), flags=pygame.HWSURFACE)
+        frame = pygame.Surface(self.internal_resolution, flags=pygame.HWSURFACE)
 
         if (self.transparent):
             frame = frame.convert_alpha()
@@ -108,6 +124,9 @@ class Camera(lifecycle.Node):
                 text = node.text
                 rect = node.rect
                 frame.blit(text, rect)
+
+        if(frame.get_size() != wm.window.get_size()):
+            frame = pygame.transform.scale(frame, wm.window.get_size())
 
         wm.window.blit(frame, (0, 0))
 
