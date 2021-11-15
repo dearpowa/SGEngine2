@@ -95,8 +95,6 @@ class FPSCamera(Camera):
         self.render_distance = 100
         self.rotation = 0
         self.rect = pygame.Rect(0, 0, 0 ,0)
-        self.scan_resolution = 100
-        self.scale = (1, 1)
         self.last_frame: pygame.Surface = None
         self.render_thread: Thread = None
 
@@ -126,7 +124,7 @@ class FPSCamera(Camera):
 
         origin = self.rect.center
 
-        frame = pygame.Surface(tuple(ele1 * ele2 for ele1, ele2 in zip(wm.window.get_size(), self.scale)), flags=pygame.HWSURFACE)
+        frame = pygame.Surface(wm.window.get_size())
 
         step_size = self.fov / frame.get_rect().width
 
@@ -168,11 +166,12 @@ class FPSCamera(Camera):
                 rect_to_draw.centery = frame.get_rect().centery
                 rect_to_draw.left = i
 
-                frame.fill(color, rect_to_draw)
+                frame.lock()
+                pygame.draw.rect(frame, color, rect_to_draw)
+                frame.unlock()
 
             angle += step_size
 
-        frame = pygame.transform.scale(frame, wm.window.get_size())
         self.last_frame = frame
 
 
