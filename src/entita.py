@@ -17,7 +17,7 @@ class Player(Node):
         self.movement_speed = 1
         self.camera_priority = -10
         self.solid = True
-        self.camera = self.find_node_by_type(Camera)
+        self.camera: Camera = None
         self.gravity_settings.enabled = False
         return super().start()
 
@@ -67,7 +67,8 @@ class Player(Node):
         if (colliding):
             self.rect.topleft = last_pos.topleft
 
-        self.camera.rect.center = self.rect.center
+        if self.camera:
+            self.camera.rect.center = self.rect.center
 
         return super().update()
 

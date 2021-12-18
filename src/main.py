@@ -1,7 +1,7 @@
 import pygame
 import sgengine
-from scenes import Scene1, Scene2
+from scenes import Scene1, Scene2, Scene3
 
 sgengine.init()
-sgengine.event_loop().add_child(Scene1())
+sgengine.event_loop().add_child(Scene3())
 sgengine.start()

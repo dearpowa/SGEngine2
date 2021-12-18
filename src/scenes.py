@@ -29,10 +29,10 @@ class Scene1(Node):
         self.add_child(self.tree3)
 
         super().start()
-        camera.internal_resolution = (160, 90)
+        camera.internal_resolution = (320, 180)
         fps_counter.set_size(10)
-        sgengine.window_manager().resolution = (1280, 720)
-        sgengine.window_manager().fullscreen = True
+        sgengine.window_manager().resolution = (800, 400)
+        sgengine.window_manager().fullscreen = False
 
     def started(self) -> None:
         self.tree1.rect.move_ip(0, 10)
@@ -70,3 +70,15 @@ class Scene2(Node):
         self.wall2.color = (0, 255, 0)
         self.camera.transparent = True
         return super().started()
+
+
+class Scene3(Node):
+    
+    def start(self) -> None:
+        super().start()
+        foxy = Player(self)
+        camera = Camera(self)
+        fps_counter = FPSCounter(self)
+
+        foxy.sprite = pygame.image.load("assets/foxy.bmp")
+        foxy.rect = foxy.sprite.get_rect()

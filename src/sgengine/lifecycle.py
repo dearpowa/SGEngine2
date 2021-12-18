@@ -8,7 +8,7 @@ import sgengine
 
 class Node:
 
-    def __init__(self) -> None:
+    def __init__(self, parent: 'Node'=None) -> None:
         self.position = (0, 0)
         self.parent: 'Node' = None
         self.childs: List['Node'] = []
@@ -23,6 +23,8 @@ class Node:
             self.add_alive_node(self)
         else:
             sgengine.event_loop().add_alive_node(self)
+        if parent:
+            parent.add_child(self, True)
 
     def start(self) -> None:
         for child in self.childs:

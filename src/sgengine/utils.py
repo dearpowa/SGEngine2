@@ -1,4 +1,7 @@
 from typing import Tuple
+from pygame import surface
+
+from pygame.surface import Surface
 from sgengine import lifecycle
 import pygame
 import math
@@ -13,6 +16,14 @@ def line_lenght(origin: Tuple[float, float], end: Tuple[float, float]) -> float:
     x1, y1 = origin
     x2, y2 = end
     return math.sqrt(math.pow(x2 - x1, 2) + math.pow(y2 - y1, 2))
+
+def clear_surface(surf: Surface) -> None:
+    surf.fill((0, 0, 0))
+
+def make_transparent(surf: Surface) -> None:
+    clear_surface(surf)
+    surf.convert_alpha()
+    surf.set_colorkey((0, 0, 0))
 
 class FPSCounter(lifecycle.Node):
 

@@ -1,5 +1,7 @@
 from typing import Tuple
-from sgengine import lifecycle
+
+from pygame.surface import Surface
+from sgengine import lifecycle, utils
 import pygame
 import sgengine
 
@@ -82,6 +84,7 @@ class Camera(lifecycle.Node):
         self.solid = False
         self.transparent = False
         self.internal_resolution = (0, 0)
+        self.current_frame: Surface = None
         return super().start()
 
     def update(self) -> None:
@@ -101,14 +104,15 @@ class Camera(lifecycle.Node):
         alive_nodes.sort(
             key=lambda n: n.camera_priority, reverse=True)
 
-        frame = pygame.Surface(self.internal_resolution, flags=pygame.HWSURFACE)
+        if not self.current_frame:
+            self.current_frame = Surface(self.internal_resolution, flags=pygame.HWSURFACE)
 
         if (self.transparent):
-            frame = frame.convert_alpha()
-            frame.fill((0, 0, 0))
-            frame.set_colorkey((0, 0, 0))
+            utils.make_transparent(self.current_frame)
+        else:
+            utils.clear_surface(self.current_frame)
 
-        frame_rect = frame.get_rect()
+        frame_rect = self.current_frame.get_rect()
 
         self.rect.width = frame_rect.width
         self.rect.height = frame_rect.height
@@ -117,18 +121,19 @@ class Camera(lifecycle.Node):
             if hasattr(node, "sprite") and node.sprite != None and node.rect != None:
                 sprite = node.sprite
                 rect = node.rect.move(-self.rect.left, -self.rect.top)
-                frame.blit(sprite, rect)
+                self.current_frame.blit(sprite, rect)
 
         for node in sgengine.event_loop().alive_nodes():
             if hasattr(node, "text") and node.text != None and node.rect != None:
                 text = node.text
                 rect = node.rect
-                frame.blit(text, rect)
+                self.current_frame.blit(text, rect)
 
-        if(frame.get_size() != wm.window.get_size()):
-            frame = pygame.transform.scale(frame, wm.window.get_size())
+        scaled_frame = self.current_frame
+        if(self.current_frame.get_size() != wm.window.get_size()):
+            scaled_frame = pygame.transform.scale(self.current_frame, wm.window.get_size())
 
-        wm.window.blit(frame, (0, 0))
+        wm.window.blit(scaled_frame, (0, 0))
 
     def find_window_manager(self) -> WindowManager:
         return sgengine.window_manager()
