@@ -1,6 +1,8 @@
 import pygame
 from pygame import color
-import sgengine
+from sgengine import event_loop, window_manager
+from sgengine.common import PlayerController
+from sgengine.input import check_input
 from sgengine.lifecycle import Node
 from sgengine.physics import Gravity
 from sgengine.screen import Camera
@@ -31,8 +33,8 @@ class Scene1(Node):
         super().start()
         camera.internal_resolution = (320, 180)
         fps_counter.set_size(10)
-        sgengine.window_manager().resolution = (800, 400)
-        sgengine.window_manager().fullscreen = False
+        window_manager().resolution = (800, 400)
+        window_manager().fullscreen = False
 
     def started(self) -> None:
         self.tree1.rect.move_ip(0, 10)
@@ -42,11 +44,11 @@ class Scene1(Node):
         return super().started()
 
     def update(self) -> None:
-        events = sgengine.event_loop().get_current_events()
+        events = event_loop().get_current_events()
 
         for e in events:
             if e.type == pygame.KEYUP and e.key == pygame.K_ESCAPE:
-                sgengine.event_loop().is_running = False
+                event_loop().is_running = False
         return super().update()
 
 
@@ -76,9 +78,16 @@ class Scene3(Node):
     
     def start(self) -> None:
         super().start()
-        foxy = Player(self)
+        foxy = PlayerController(self)
         camera = Camera(self)
         fps_counter = FPSCounter(self)
 
-        foxy.sprite = pygame.image.load("assets/foxy.bmp")
-        foxy.rect = foxy.sprite.get_rect()
+        foxy.set_sprite(pygame.image.load("assets/foxy.bmp"))
+
+    def update(self) -> None:
+        events = event_loop().get_current_events()
+
+        if check_input("exit", events, pygame.KEYUP):
+            event_loop().stop()
+
+        return super().update()

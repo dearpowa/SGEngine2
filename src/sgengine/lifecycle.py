@@ -52,7 +52,6 @@ class Node:
     Aggiunge un figlio al nodo
     ritorna se il processo è andato a buon fine
     """
-
     def add_child(self, child: 'Node', trigger_start=False) -> bool:
         if issubclass(type(child), Node):
             child.parent = self
@@ -67,7 +66,6 @@ class Node:
     Rimuove un figlio dal nodo
     ritorna se il processo è andato a buon fine
     """
-
     def remove_child(self, child: 'Node') -> bool:
         try:
             self.childs.remove(child)
@@ -80,7 +78,6 @@ class Node:
     Sostituisco un figlio con uno nuovo, quello vecchio viene anche eliminato dalla lista dei nodi vivi
     ritorna se il processo è andato a buon fine
     """
-
     def substitute_child(self, child: 'Node', new_child: 'Node') -> bool:
         return child.kill() and self.add_child(new_child)
 
@@ -89,7 +86,6 @@ class Node:
     infine elimino il nodo dalla lista dei nodi vivi
     ritorna se il processo è andato a buon fine
     """
-
     def kill(self) -> bool:
         # Se uccido un nodo devo uccidere anche tutti i figli
         try:
@@ -164,7 +160,6 @@ class EventLoop(Node):
     """
     ritorna la lista dei nodi vivi
     """
-
     def alive_nodes(self) -> List[Node]:
         if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
             self._alive_nodes = []
@@ -173,7 +168,6 @@ class EventLoop(Node):
     """
     aggiunge un nodo alla lista dei nodi vivi
     """
-
     def add_alive_node(self, node: Node) -> None:
         if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
             self._alive_nodes = []
@@ -182,7 +176,6 @@ class EventLoop(Node):
     """
     rimuove un nodo dalla lista dei nodi vivi
     """
-
     def remove_alive_node(self, node: Node) -> None:
         if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
             self._alive_nodes = []
@@ -191,7 +184,6 @@ class EventLoop(Node):
     """
     ritorna se un nodo è presente nella lista dei nodi vivi
     """
-
     def is_node_alive(self, node: Node) -> bool:
         if not hasattr(self, "_alive_nodes") or self._alive_nodes == None:
             self._alive_nodes = []

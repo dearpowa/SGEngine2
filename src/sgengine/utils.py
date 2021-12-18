@@ -5,6 +5,7 @@ from pygame.surface import Surface
 from sgengine import lifecycle
 import pygame
 import math
+from datetime import datetime
 
 import sgengine
 
@@ -24,6 +25,9 @@ def make_transparent(surf: Surface) -> None:
     clear_surface(surf)
     surf.convert_alpha()
     surf.set_colorkey((0, 0, 0))
+
+def log(log: str):
+    print(f"[{datetime.now()}]: {log}")
 
 class FPSCounter(lifecycle.Node):
 
