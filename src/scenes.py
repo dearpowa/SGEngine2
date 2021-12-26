@@ -5,7 +5,7 @@ from sgengine.common import PlayerController
 from sgengine.input import check_input
 from sgengine.lifecycle import Node
 from sgengine.physics import Gravity
-from sgengine.screen import Camera
+from sgengine.screen import Camera, RenderType
 from entita import FPSCamera, FPSPlayer, Player, Tree, Wall
 from sgengine.utils import FPSCounter
 
@@ -81,8 +81,10 @@ class Scene3(Node):
         foxy = PlayerController(self)
         camera = Camera(self)
         fps_counter = FPSCounter(self)
-
+        #fps_counter.render_type = RenderType.UI
+        
         foxy.set_sprite(pygame.image.load("assets/foxy.bmp"))
+        foxy.on_update = lambda: self.update_camera(foxy, camera)
 
     def update(self) -> None:
         events = event_loop().get_current_events()
@@ -90,4 +92,7 @@ class Scene3(Node):
         if check_input("exit", events, pygame.KEYUP):
             event_loop().stop()
 
-        return super().update()
+        super().update()
+
+    def update_camera(self, node1: Node, camera: Camera):
+        camera.rect.center = node1.rect.center

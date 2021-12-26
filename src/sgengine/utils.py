@@ -2,12 +2,12 @@ from typing import Tuple
 from pygame import surface
 
 from pygame.surface import Surface
-from sgengine import lifecycle
 import pygame
 import math
 from datetime import datetime
 
 import sgengine
+from sgengine.lifecycle import Node
 
 
 def create_line(origin: Tuple[float, float], lenght: float, angle: float) -> Tuple[Tuple[float], Tuple[float]]:
@@ -29,7 +29,7 @@ def make_transparent(surf: Surface) -> None:
 def log(log: str):
     print(f"[{datetime.now()}]: {log}")
 
-class FPSCounter(lifecycle.Node):
+class FPSCounter(Node):
 
     def start(self) -> None:
         self.rect = pygame.Rect(0, 0, 0, 0)

@@ -13,11 +13,14 @@ class Node:
         self.parent: 'Node' = None
         self.childs: List['Node'] = []
         self.id = str(uuid.uuid4())
-
+        self.render_type = sgengine.screen.RenderType.SPACE
         self.rect = pygame.Rect(0, 0, 0, 0)
         self.solid = False
         self.camera_priority = 0
         self.gravity_settings = physics.GravitySettings()
+        self.on_start: function = None
+        self.on_update: function = None
+        self.on_kill: function = None
         # Se l'event loop è in creazione, deve accedere a se stesso direttamente
         if issubclass(type(self), EventLoop):
             self.add_alive_node(self)
@@ -31,6 +34,8 @@ class Node:
             if issubclass(type(child), Node):
                 child.start()
         self.started()
+        if self.on_start:
+            self.on_start()
 
     def started(self) -> None:
         pass
@@ -46,6 +51,9 @@ class Node:
             else:
                 # Se il figlio non è un nodo lo rimuovo
                 self.remove_child(child)
+
+        if self.on_update:
+            self.on_update()
         pass
 
     """
@@ -98,6 +106,9 @@ class Node:
                 result = self.parent.remove_child(self)
 
             sgengine.event_loop().remove_alive_node(self)
+            if self.on_kill:
+                self.on_kill()
+
             return result
         except:
             return False

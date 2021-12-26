@@ -2,9 +2,14 @@ from typing import Tuple
 
 from pygame.surface import Surface
 from sgengine import lifecycle, utils
+from enum import Enum
 import pygame
 import sgengine
 
+
+class RenderType(Enum):
+    UI = 0
+    SPACE = 1
 
 class WindowManager(lifecycle.Node):
 
@@ -118,16 +123,27 @@ class Camera(lifecycle.Node):
         self.rect.height = frame_rect.height
 
         for node in alive_nodes:
+            to_render = None
+            rect = None
             if hasattr(node, "sprite") and node.sprite != None and node.rect != None:
-                sprite = node.sprite
-                rect = node.rect.move(-self.rect.left, -self.rect.top)
-                self.current_frame.blit(sprite, rect)
-
-        for node in sgengine.event_loop().alive_nodes():
+                to_render = node.sprite
             if hasattr(node, "text") and node.text != None and node.rect != None:
-                text = node.text
+                to_render = node.text
+
+            if not to_render:
+                continue
+
+            """
+            Controllo il tipo di render dell'oggetto
+            SPACE viene renderizzato in relazione alla posizione nello spazio
+            UI viene rendereizzato in relazione alla posizione nella UI
+            """
+            if node.render_type == RenderType.SPACE:
+                rect = node.rect.move(-self.rect.left, -self.rect.top)
+            elif node.render_type == RenderType.UI:
                 rect = node.rect
-                self.current_frame.blit(text, rect)
+
+            self.current_frame.blit(to_render, rect)
 
         scaled_frame = self.current_frame
         if(self.current_frame.get_size() != wm.window.get_size()):
