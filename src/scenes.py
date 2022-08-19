@@ -7,7 +7,7 @@ from sgengine.lifecycle import Node
 from sgengine.physics import Gravity
 from sgengine.screen import Camera, RenderType
 from entita import FPSCamera, FPSPlayer, Player, Tree, Wall
-from sgengine.utils import FPSCounter
+from sgengine.utils import FPSCounter, UIText
 
 
 class Scene1(Node):
@@ -79,15 +79,24 @@ class Scene3(Node):
     def start(self) -> None:
         super().start()
         foxy = PlayerController(self)
+        foxy.id = "foxy"
         camera = Camera(self)
         fps_counter = FPSCounter(self)
-        #fps_counter.render_type = RenderType.UI
+        foxy_pos = UIText(self)
+        foxy_pos.id = "foxy_pos"
+        foxy_pos.rect.topleft = (0, 30)
+        foxy_pos.set_font("assets/OpenSans-Regular.ttf")
+        foxy_pos.set_size(30)
         
         foxy.set_sprite(pygame.image.load("assets/foxy.bmp"))
         foxy.on_update = lambda: self.update_camera(foxy, camera)
 
     def update(self) -> None:
         events = event_loop().get_current_events()
+
+        foxy_pos: UIText = self.find_node_by_id("foxy_pos")
+        foxy: PlayerController = self.find_node_by_id("foxy")
+        foxy_pos.text = f'Foxy pos: {foxy.rect.topleft}'
 
         if check_input("exit", events, pygame.KEYUP):
             event_loop().stop()

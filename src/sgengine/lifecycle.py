@@ -123,6 +123,9 @@ class Node:
     def find_node_by_type(self, clz) -> 'Node':
         return sgengine.event_loop().find_node_by_type(clz)
 
+    def find_node_by_id(self, id: str) -> 'Node':
+        return sgengine.event_loop().find_node_by_id(id)
+
 from sgengine import physics
 
 class EventLoop(Node):
@@ -206,3 +209,14 @@ class EventLoop(Node):
                 return node
 
         return None
+
+    """
+    ritorna un nodo tramite il suo id, se il nodo non è presente ritorna None
+    """
+    def find_node_by_id(self, id: str) -> Node:
+        for node in self.alive_nodes():
+            if (node.id == id):
+                return node
+
+        return None
+

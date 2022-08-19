@@ -127,10 +127,13 @@ class Camera(lifecycle.Node):
             rect = None
             if hasattr(node, "sprite") and node.sprite != None and node.rect != None:
                 to_render = node.sprite
-            if hasattr(node, "text") and node.text != None and node.rect != None:
-                to_render = node.text
 
-            if not to_render:
+            if to_render is None:
+                continue
+
+            if type(to_render) is not pygame.Surface:
+                print(f'Node: {node.id}, {type(node)} does not have a valid sprite')
+                node.sprite = None
                 continue
 
             """

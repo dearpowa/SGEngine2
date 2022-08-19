@@ -9,7 +9,6 @@ from datetime import datetime
 import sgengine
 from sgengine.lifecycle import Node
 
-
 def create_line(origin: Tuple[float, float], lenght: float, angle: float) -> Tuple[Tuple[float], Tuple[float]]:
     return(origin, (origin[0] + (lenght * math.cos(math.radians(angle))), origin[1] + (lenght * math.sin(math.radians(angle)))))
 
@@ -29,22 +28,50 @@ def make_transparent(surf: Surface) -> None:
 def log(log: str):
     print(f"[{datetime.now()}]: {log}")
 
-class FPSCounter(Node):
+class Text(Node):
 
     def start(self) -> None:
-        self.rect = pygame.Rect(0, 0, 0, 0)
-        self.text: pygame.Surface = None
-        self.set_size(30)
+        self.text = ""
+        self.sprite: pygame.Surface = None,
+        self.__font_path: str = None
+        self.__size: int = None
+        self.__font: pygame.font.Font = None
+        self.color = (255, 255, 255)
+        self.aliased = True
         return super().start()
+
+    def update(self) -> None:
+        if self.__font is not None and self.color is not None:
+            self.sprite = self.__font.render(self.text, self.aliased, self.color)
+        return super().update()
+
+    def set_font(self, font_path: str):
+        self.__font_path = font_path
+        self.__update_font()
+
+    def set_size(self, size: int):
+        self.__size = size
+        self.__update_font()
+
+    def __update_font(self):
+        if self.__font_path is not None and self.__size is not None:
+            self.__font = pygame.font.Font(self.__font_path, self.__size)
+
+class UIText(Text):
+    def start(self) -> None:
+        super().start()
+        self.render_type = sgengine.screen.RenderType.UI
+
+class FPSCounter(UIText):
+
+    def start(self) -> None:
+        super().start()
+        self.set_size(30)
+        self.set_font("assets/OpenSans-Regular.ttf")
 
     def update(self) -> None:
         fps = sgengine.event_loop().current_framerate
         frametime = sgengine.event_loop().current_frametime
 
-        text = "fps: " + "{:.1f}".format(fps) + " frametime: " + "{:.1f}".format(frametime)
-
-        self.text = self.font.render(text, True, (255, 255, 255))
+        self.text = "fps: " + "{:.1f}".format(fps) + " frametime: " + "{:.1f}".format(frametime)
         return super().update()
-
-    def set_size(self, size: int) -> None:
-        self.font = pygame.font.Font("assets/OpenSans-Regular.ttf", size)
