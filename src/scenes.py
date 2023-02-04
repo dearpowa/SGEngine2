@@ -31,9 +31,9 @@ class Scene1(Node):
         self.add_child(self.tree3)
 
         super().start()
-        camera.internal_resolution = (320, 180)
+        camera.internal_resolution = (128, 128)
         fps_counter.set_size(10)
-        window_manager().resolution = (800, 400)
+        window_manager().resolution = (400, 400)
         window_manager().fullscreen = False
 
     def started(self) -> None:
@@ -57,12 +57,15 @@ class Scene2(Node):
         self.wall1 = Wall()
         self.wall2 = Wall()
         self.camera = Camera()
-        self.add_child(FPSCamera())
+        self.fps_camera = FPSCamera()
+        self.fps_camera.fov = 40
+        self.add_child(self.fps_camera)
         self.add_child(self.camera)
         self.add_child(FPSCounter())
         self.add_child(FPSPlayer())
         self.add_child(self.wall1)
         self.add_child(self.wall2)
+        event_loop().framerate = 25
         return super().start()
 
     def started(self) -> None:

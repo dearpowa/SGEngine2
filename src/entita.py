@@ -1,5 +1,7 @@
+from datetime import datetime
 from sgengine import physics, start, utils
 from sgengine.lifecycle import Node
+from threading import Thread
 import sgengine
 import pygame
 import math
@@ -97,7 +99,9 @@ class FPSCamera(Camera):
         self.last_frame: pygame.Surface = None
         self.render_thread: Thread = None
 
-        return super().start()
+        super().start()
+        self.render_thread = Thread(target=self.render_frame)
+        self.render_thread.start()
 
     def draw_on_screen(self) -> None:
 
@@ -105,11 +109,13 @@ class FPSCamera(Camera):
 
         if wm == None or wm.window == None:
             return
-
-        self.construct_frame()
         
         if self.last_frame:
             wm.window.blit(self.last_frame, (0, 0))
+
+    def render_frame(self):
+        while self.is_alive():
+            self.construct_frame()
 
     def construct_frame(self):
         wm = self.find_window_manager()
@@ -140,6 +146,7 @@ class FPSCamera(Camera):
                 if hasattr(node, "wall") and node.wall and node.rect and hasattr(node, "color") and node.color:
                     #Render vertical line
                     result = node.rect.clipline(line)
+                    #result = utils.line_rectangle_intersection(line[0], line[1], node.rect.topleft, node.rect.bottomright)
                     if result:
                         start, end = result
                         lenght = utils.line_lenght(origin, start)
@@ -165,9 +172,7 @@ class FPSCamera(Camera):
                 rect_to_draw.centery = frame.get_rect().centery
                 rect_to_draw.left = i
 
-                frame.lock()
-                pygame.draw.rect(frame, color, rect_to_draw)
-                frame.unlock()
+                pygame.draw.line(frame, color=color, start_pos=rect_to_draw.bottomleft, end_pos=rect_to_draw.topright, width=1)
 
             angle += step_size
 
